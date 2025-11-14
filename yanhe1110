@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>烟盒变现·扫码回收</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+            /* 全局禁止文本选择复制 */
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        body {
+            background-color: #f5f5f5;
+            padding: 12px;
+            padding-bottom: 80px; /* 适配底部导航栏 */
+            /* 禁止触摸长按弹出菜单 */
+            -webkit-touch-callout: none;
+            touch-action: none;
+        }
+        /* 顶部悬浮交易投诉 */
+        .float-complaint {
+            position: fixed;
+            top: 12px;
+            right: 12px;
+            background-color: #333;
+            color: #fff;
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            text-decoration: none;
+            z-index: 998;
+        }
+        /* 顶部提示栏 */
+        .top-bar {
+            background-color: #fff8e6;
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+        }
+        .top-bar .title {
+            color: #ff9800;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        /* 通用卡片 */
+        .card {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .card .card-title {
+            font-size: 17px;
+            font-weight: bold;
+            margin-bottom: 16px;
+            color: #333;
+        }
+        /* 扫码流程模块 */
+        .flow-container {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 16px;
+            position: relative;
+        }
+        .flow-container::after {
+            content: "";
+            position: absolute;
+            top: 20px;
+            left: 12%;
+            width: 76%;
+            height: 1px;
+            background-color: #e0e0e0;
+            z-index: 1;
+        }
+        .flow-item {
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+        .flow-item .num {
+            width: 28px;
+            height: 28px;
+            background-color: #fff;
+            border: 1px solid #ffb74d;
+            border-radius: 50%;
+            color: #ff9800;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 4px;
+            font-size: 13px;
+        }
+        .flow-item .text {
+            font-size: 13px;
+            color: #666;
+        }
+        .barcode-tip {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        .barcode-img {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+        .barcode-img img {
+            width: 55%;
+            max-width: 180px;
+            pointer-events: none; /* 禁止图片长按操作 */
+        }
+        .primary-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #ffb74d;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .primary-btn:active {
+            background-color: #ff9800;
+        }
+        /* 最新动态模块 */
+        .dynamic-list .item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        .dynamic-list .item:last-child {
+            border-bottom: none;
+        }
+        .item .user-info {
+            display: flex;
+            align-items: center;
+        }
+        .item .user-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            margin-right: 8px;
+            pointer-events: none; /* 禁止头像长按操作 */
+        }
+        .item .user-text {
+            font-size: 13px;
+            color: #333;
+        }
+        .item .time {
+            font-size: 12px;
+            color: #999;
+        }
+        /* 收益榜单模块 */
+        .rank-card .card-title {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .rank-list .item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        .rank-list .item:last-child {
+            border-bottom: none;
+        }
+        .rank-item .rank-info {
+            display: flex;
+            align-items: center;
+        }
+        .rank-item .rank-tag {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 11px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 8px;
+        }
+        .rank-tag.rank1 {
+            background-color: #ffc107;
+        }
+        .rank-tag.rank2 {
+            background-color: #e91e63;
+        }
+        .rank-tag.rank3 {
+            background-color: #2196f3;
+        }
+        .rank-tag.rank4, .rank-tag.rank5 {
+            background-color: #ccc;
+            color: #333;
+        }
+        .rank-item .rank-amount {
+            font-size: 14px;
+            color: #ff9800;
+            font-weight: 500;
+        }
+        .rank-tip {
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+            margin-top: 8px;
+        }
+        /* 收费说明模块 */
+        .faq-list {
+            font-size: 13px;
+            color: #333;
+            line-height: 1.7;
+        }
+        .faq-list li {
+            margin-bottom: 8px;
+            list-style-position: inside;
+        }
+        .copyright {
+            text-align: center;
+            font-size: 11px;
+            color: #999;
+            margin-top: 12px;
+        }
+        /* 底部悬浮激活栏（适配底部导航） */
+        .activate-bar {
+            display: flex;
+            background-color: #333;
+            color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            position: fixed;
+            bottom: 70px; /* 避开底部导航栏 */
+            left: 12px;
+            right: 12px;
+            z-index: 999;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        .activate-bar .price-area {
+            flex: 1;
+            padding: 14px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 15px;
+        }
+        .activate-bar .activate-btn {
+            flex: 1;
+            background-color: #ffd600;
+            color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        /* 弹窗通用遮罩 */
+        .mask {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            display: none;
+        }
+        /* 激活提示弹窗 */
+        .activate-tip-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 18px;
+            width: 75%;
+            max-width: 280px;
+            text-align: center;
+            z-index: 1002;
+            display: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .activate-tip-modal .modal-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 12px;
+            color: #333;
+        }
+        .activate-tip-modal .modal-desc {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+        .activate-tip-modal .btn-group {
+            display: flex;
+            border-top: 1px solid #eee;
+        }
+        .activate-tip-modal .btn-group button {
+            flex: 1;
+            padding: 10px 0;
+            border: none;
+            background-color: transparent;
+            font-size: 15px;
+            cursor: pointer;
+        }
+        .activate-tip-modal .cancel-btn {
+            color: #333;
+            border-right: 1px solid #eee;
+        }
+        .activate-tip-modal .go-activate-btn {
+            color: #1677ff;
+            font-weight: 500;
+        }
+        /* 支付弹窗 */
+        .pay-modal {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #fff;
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+            padding: 20px 16px;
+            z-index: 1001;
+            display: none;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        }
+        .pay-modal .modal-title {
+            font-size: 17px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 25px;
+            position: relative;
+            color: #333;
+        }
+        .pay-modal .close-btn {
+            position: absolute;
+            top: 0;
+            right: 0;
+            font-size: 20px;
+            color: #999;
+            cursor: pointer;
+        }
+        .pay-modal .amount-wrap {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .pay-modal .amount-label {
+            font-size: 13px;
+            color: #999;
+            margin-bottom: 5px;
+        }
+        .pay-modal .amount {
+            font-size: 32px;
+            font-weight: bold;
+            color: #000;
+        }
+        .pay-modal .pay-method {
+            margin-bottom: 25px;
+        }
+        .pay-modal .method-label {
+            font-size: 15px;
+            font-weight: 500;
+            margin-bottom: 12px;
+            color: #333;
+        }
+        .pay-modal .method-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-radius: 6px;
+            background-color: #f5f5f5;
+        }
+        .pay-modal .method-item.active {
+            background-color: #e8f5e9;
+            border: 1px solid #4caf50;
+        }
+        .pay-modal .method-icon {
+            width: 22px;
+            height: 22px;
+            margin-right: 8px;
+            pointer-events: none; /* 禁止图标长按操作 */
+        }
+        .pay-modal .method-name {
+            font-size: 14px;
+            flex: 1;
+            color: #333;
+        }
+        .pay-modal .check-icon {
+            color: #4caf50;
+            font-size: 18px;
+        }
+        /* 优化后的支付按钮 */
+        .pay-btn {
+            width: 100%;
+            padding: 16px; /* 增大内边距 */
+            background-color: #ff9800; /* 改为橙色，与扫码按钮呼应 */
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 17px; /* 增大字体 */
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 3px 8px rgba(255,152,0,0.3); /* 增加橙色阴影 */
+            transition: all 0.2s;
+        }
+        .pay-btn:active {
+            background-color: #f57c00; /* 按压加深颜色 */
+            box-shadow: 0 2px 4px rgba(255,152,0,0.2);
+            transform: translateY(1px); /* 轻微下沉效果 */
+        }
+        /* 跳转加载提示 */
+        .loading-toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0,0,0,0.7);
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 1003;
+            display: none;
+        }
+        /* 底部导航栏 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            background-color: #fff;
+            box-shadow: 0 -1px 4px rgba(0,0,0,0.08);
+            z-index: 1000;
+        }
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            padding: 10px 0;
+            cursor: pointer;
+            color: #666;
+            transition: color 0.2s;
+        }
+        .nav-item.active {
+            color: #ff9800;
+        }
+        .nav-icon {
+            font-size: 18px;
+            margin-bottom: 4px;
+            display: block;
+        }
+        .nav-text {
+            font-size: 12px;
+        }
+        /* 我的页面样式 */
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+        }
+        #homePage {
+            display: block; /* 默认显示首页 */
+        }
+        .user-header {
+            display: flex;
+            align-items: center;
+            padding: 16px 12px;
+            background-color: #fff;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+        .avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-color: #eee;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #999;
+            margin-right: 12px;
+            pointer-events: none; /* 禁止头像长按操作 */
+        }
+        .username {
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+        }
+        .points-card {
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            padding: 14px 12px;
+            margin: 0 0 16px;
+            font-size: 16px;
+            color: #333;
+            background-color: #fff;
+        }
+        .my-menu {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 0 12px;
+        }
+        .menu-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 0;
+            border-bottom: 1px solid #f5f5f5;
+            font-size: 15px;
+            color: #333;
+            cursor: pointer;
+        }
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+        .menu-icon {
+            margin-right: 12px;
+            font-size: 18px;
+            color: #666;
+        }
+        .arrow {
+            color: #999;
+            font-size: 14px;
+        }
+        /* 联系客服二维码弹窗 */
+        .qrcode-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            border-radius: 12px;
+            padding: 16px;
+            width: 80%;
+            max-width: 300px;
+            z-index: 1002;
+            display: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .qrcode-modal img {
+            width: 100%;
+            border-radius: 8px;
+            pointer-events: none; /* 禁止二维码长按操作 */
+        }
+        .close-qrcode-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background-color: transparent;
+            border: none;
+            font-size: 20px;
+            color: #999;
+            cursor: pointer;
+        }
+        /* 未完善提示弹窗 */
+        .tips-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            border-radius: 12px;
+            padding: 20px 16px;
+            width: 70%;
+            max-width: 280px;
+            text-align: center;
+            z-index: 1002;
+            display: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .tips-title {
+            font-size: 17px;
+            font-weight: bold;
+            margin-bottom: 12px;
+            color: #333;
+        }
+        .tips-content {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 16px;
+        }
+        .close-tips-btn {
+            padding: 8px 24px;
+            background-color: #ff9800;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<!-- 禁止长按复制、右键菜单、触摸长按事件 -->
+<body oncontextmenu="return false" ontouchstart="return false" oncopy="return false" oncut="return false" onpaste="return false">
+    <!-- 顶部悬浮交易投诉 -->
+    <a href="#" class="float-complaint">交易投诉</a>
+
+    <!-- 首页页面 -->
+    <div class="page" id="homePage">
+        <!-- 顶部提示栏 -->
+        <div class="top-bar">
+            <div class="title">烟盒变现·扫码回收</div>
+        </div>
+
+        <!-- 扫码回收卡片 -->
+        <div class="card">
+            <div class="card-title">扫码回收</div>
+            <div class="flow-container">
+                <div class="flow-item">
+                    <div class="num">1</div>
+                    <div class="text">扫条形码</div>
+                </div>
+                <div class="flow-item">
+                    <div class="num">2</div>
+                    <div class="text">扫二维码</div>
+                </div>
+                <div class="flow-item">
+                    <div class="num">3</div>
+                    <div class="text">领取奖励</div>
+                </div>
+            </div>
+            <div class="barcode-tip">条形码一般在盒子侧面，形状如下：</div>
+            <div class="barcode-img">
+                <img src="http://image.yh.szwwhl.com/web/assets/scan-step-1-R7vssudK.png" alt="条形码示例">
+            </div>
+            <button class="primary-btn" id="scanBarcodeBtn">第一步，扫条形码</button>
+        </div>
+
+        <!-- 最新动态卡片 -->
+        <div class="card">
+            <div class="card-title">最新动态</div>
+            <div class="dynamic-list" id="dynamicList"></div>
+        </div>
+
+        <!-- 收益榜单卡片 -->
+        <div class="card rank-card">
+            <div class="card-title">
+                <span>收益榜单</span>
+            </div>
+            <div class="rank-list">
+                <div class="item rank-item">
+                    <div class="rank-info">
+                        <div class="rank-tag rank1">1</div>
+                        <div class="user-info">
+                            <img src="https://randomuser.me/api/portraits/men/2.jpg" class="user-avatar" alt="用户头像">
+                            <div class="user-text">用户39860700</div>
+                        </div>
+                    </div>
+                    <div class="rank-amount">¥474992.07</div>
+                </div>
+                <div class="item rank-item">
+                    <div class="rank-info">
+                        <div class="rank-tag rank2">2</div>
+                        <div class="user-info">
+                            <img src="https://randomuser.me/api/portraits/women/3.jpg" class="user-avatar" alt="用户头像">
+                            <div class="user-text">无名</div>
+                        </div>
+                    </div>
+                    <div class="rank-amount">¥454111.69</div>
+                </div>
+                <div class="item rank-item">
+                    <div class="rank-info">
+                        <div class="rank-tag rank3">3</div>
+                        <div class="user-info">
+                            <img src="https://randomuser.me/api/portraits/men/4.jpg" class="user-avatar" alt="用户头像">
+                            <div class="user-text">鱼喵喵</div>
+                        </div>
+                    </div>
+                    <div class="rank-amount">¥360730.85</div>
+                </div>
+                <div class="item rank-item">
+                    <div class="rank-info">
+                        <div class="rank-tag rank4">4</div>
+                        <div class="user-info">
+                            <img src="https://randomuser.me/api/portraits/men/5.jpg" class="user-avatar" alt="用户头像">
+                            <div class="user-text">念雪归尘</div>
+                        </div>
+                    </div>
+                    <div class="rank-amount">¥341645.96</div>
+                </div>
+                <div class="item rank-item">
+                    <div class="rank-info">
+                        <div class="rank-tag rank5">5</div>
+                        <div class="user-info">
+                            <img src="https://randomuser.me/api/portraits/lego/2.jpg" class="user-avatar" alt="用户头像">
+                            <div class="user-text">凉栀°</div>
+                        </div>
+                    </div>
+                    <div class="rank-amount">¥334379.07</div>
+                </div>
+            </div>
+            <div class="rank-tip">仅展示榜单前5名</div>
+        </div>
+
+        <!-- 收费说明卡片 -->
+        <div class="card">
+            <div class="card-title">为什么收费？</div>
+            <ul class="faq-list">
+                <li>1. 持续优化服务:费用用于服务器维护、安全升级及功能迭代，确保您长期流畅使用。</li>
+                <li>2. 过滤无效用户:防止恶意注册与资源滥用，保障真实用户的体验。</li>
+                <li>3. 解锁完整功能:激活后永久享受无限畅扫。</li>
+                <li>4. 付款后若未激活成功，请联系客服处理。</li>
+            </ul>
+            <div class="copyright">
+                @copyright 2025<br>
+                赣ICP备2025064245号-2A
+            </div>
+        </div>
+
+        <!-- 底部悬浮激活栏 -->
+        <div class="activate-bar">
+            <div class="price-area">激活费¥9.90</div>
+            <div class="activate-btn" id="openModalBtn">立即激活</div>
+        </div>
+    </div>
+
+    <!-- 我的页面 -->
+    <div class="page" id="myPage">
+        <div class="user-header">
+            <div class="avatar">👤</div>
+            <div class="username">用户44756602</div>
+        </div>
+        <div class="points-card">可用积分：0</div>
+        <div class="my-menu">
+            <div class="menu-item" id="myOrderBtn">
+                <div style="display: flex; align-items: center;">
+                    <span class="menu-icon">📋</span>
+                    <span class="menu-text">我的订单</span>
+                </div>
+                <span class="arrow">→</span>
+            </div>
+            <div class="menu-item" id="pointExchangeBtn">
+                <div style="display: flex; align-items: center;">
+                    <span class="menu-icon">💰</span>
+                    <span class="menu-text">积分兑换</span>
+                </div>
+                <span class="arrow">→</span>
+            </div>
+            <div class="menu-item" id="pointDetailBtn">
+                <div style="display: flex; align-items: center;">
+                    <span class="menu-icon">📊</span>
+                    <span class="menu-text">积分明细</span>
+                </div>
+                <span class="arrow">→</span>
+            </div>
+            <div class="menu-item" id="contactServiceBtn">
+                <div style="display: flex; align-items: center;">
+                    <span class="menu-icon">📞</span>
+                    <span class="menu-text">联系客服</span>
+                </div>
+                <span class="arrow">→</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部导航栏 -->
+    <div class="bottom-nav">
+        <div class="nav-item active" data-target="homePage">
+            <span class="nav-icon">🏠</span>
+            <span class="nav-text">首页</span>
+        </div>
+        <div class="nav-item" data-target="myPage">
+            <span class="nav-icon">👤</span>
+            <span class="nav-text">我的</span>
+        </div>
+    </div>
+
+    <!-- 激活提示弹窗 -->
+    <div class="mask" id="tipMask"></div>
+    <div class="activate-tip-modal" id="activateTipModal">
+        <div class="modal-title">激活提示</div>
+        <div class="modal-desc">您当前未激活扫码权限，请激活成功后使用！</div>
+        <div class="btn-group">
+            <button class="cancel-btn" id="tipCancelBtn">取消</button>
+            <button class="go-activate-btn" id="tipGoActivateBtn">立即激活</button>
+        </div>
+    </div>
+
+    <!-- 支付弹窗 -->
+    <div class="mask" id="payMask"></div>
+    <div class="pay-modal" id="payModal">
+        <div class="modal-title">
+            激活权限
+            <span class="close-btn" id="closePayModalBtn">×</span>
+        </div>
+        <div class="amount-wrap">
+            <div class="amount-label">支付金额</div>
+            <div class="amount">¥9.9</div>
+        </div>
+        <div class="pay-method">
+            <div class="method-label">支付方式</div>
+            <div class="method-item active">
+                <div style="display: flex; align-items: center;">
+                    <img src="http://api.yh.saas.szwwhl.com/api/static/alipay_pay.png" class="method-icon" alt="支付宝图标">
+                    <div class="method-name">支付宝支付</div>
+                </div>
+                <div class="check-icon">✓</div>
+            </div>
+        </div>
+        <!-- 优化后的支付按钮 -->
+        <button class="pay-btn" id="alipayBtn">立即支付</button>
+    </div>
+
+    <!-- 联系客服二维码弹窗（替换为实际二维码链接） -->
+    <div class="mask" id="qrcodeMask"></div>
+    <div class="qrcode-modal" id="qrcodeModal">
+        <img src="https://i.imgs.ovh/2025/11/14/CZszhc.jpeg" alt="小盒码客服二维码">
+        <button class="close-qrcode-btn">×</button>
+    </div>
+
+    <!-- 未完善提示弹窗 -->
+    <div class="mask" id="tipsMask"></div>
+    <div class="tips-modal" id="tipsModal">
+        <div class="tips-title">提示</div>
+        <div class="tips-content">功能暂未完善，敬请期待！</div>
+        <button class="close-tips-btn">确定</button>
+    </div>
+
+    <!-- 跳转加载提示 -->
+    <div class="loading-toast" id="loadingToast">正在跳转至支付宝...</div>
+
+    <script>
+        // 随机数据配置
+        const NICKNAMES = ["希尔艾力", "小明", "小李", "小张", "小王", "小赵", "用户"];
+        const AVATARS = [
+            "https://randomuser.me/api/portraits/men/1.jpg",
+            "https://randomuser.me/api/portraits/lego/1.jpg",
+            "https://randomuser.me/api/portraits/thumb/men/2.jpg",
+            "https://randomuser.me/api/portraits/women/1.jpg",
+            "https://randomuser.me/api/portraits/thumb/women/2.jpg",
+            "https://randomuser.me/api/portraits/men/3.jpg",
+            "https://randomuser.me/api/portraits/women/4.jpg"
+        ];
+        let dynamicData = []; // 存储动态数据（含时间戳）
+
+        // 替换为新的支付宝支付链接
+        const ALIPAY_LINK = "https://qr.alipay.com/45t14720usgwdnmonbew594";
+
+        // 生成随机提现金额（6-36元，保留2位小数）
+        function getRandomAmount() {
+            return (Math.random() * 30 + 6).toFixed(2);
+        }
+
+        // 根据时间戳生成显示时间（刚刚/1-30分钟前）
+        function formatTime(timestamp) {
+            const now = Date.now();
+            const diff = Math.floor((now - timestamp) / 60000); // 分钟差
+            return diff === 0 ? "刚刚" : diff <= 30 ? `${diff}分钟前` : `${Math.floor(diff/60)}小时前`;
+        }
+
+        // 生成随机用户名
+        function getRandomUsername() {
+            const nickname = NICKNAMES[Math.floor(Math.random() * NICKNAMES.length)];
+            return nickname === "用户" ? `${nickname}${Math.floor(Math.random() * 1000000)}` : nickname;
+        }
+
+        // 生成单条动态数据（含时间戳）
+        function generateDynamicData() {
+            return {
+                id: Date.now(), // 用时间戳当唯一ID
+                timestamp: Date.now() - Math.floor(Math.random() * 30 * 60000), // 随机0-30分钟前的时间戳
+                username: getRandomUsername(),
+                amount: getRandomAmount(),
+                avatar: AVATARS[Math.floor(Math.random() * AVATARS.length)]
+            };
+        }
+
+        // 渲染动态列表（按时间戳降序排序：最新在上）
+        function renderDynamicList() {
+            const dynamicList = document.getElementById("dynamicList");
+            dynamicList.innerHTML = "";
+            // 排序后渲染
+            dynamicData.sort((a, b) => b.timestamp - a.timestamp).forEach(item => {
+                dynamicList.innerHTML += `
+                    <div class="item">
+                        <div class="user-info">
+                            <img src="${item.avatar}" class="user-avatar" alt="用户头像">
+                            <div class="user-text">${item.username}已提现${item.amount}元</div>
+                        </div>
+                        <div class="time">${formatTime(item.timestamp)}</div>
+                    </div>
+                `;
+            });
+        }
+
+        // 初始化：生成5条随机动态并排序渲染
+        function initDynamicList() {
+            for (let i = 0; i < 5; i++) {
+                dynamicData.push(generateDynamicData());
+            }
+            renderDynamicList();
+        }
+
+        // 定时更新：删除时间最早的一条，新增一条，重新排序渲染（3-5秒间隔）
+        function updateDynamicList() {
+            // 删除时间戳最小（最旧）的一条
+            dynamicData = dynamicData.sort((a, b) => a.timestamp - b.timestamp).slice(1);
+            // 新增一条最新动态（时间戳为当前时间）
+            dynamicData.push({
+                id: Date.now(),
+                timestamp: Date.now(),
+                username: getRandomUsername(),
+                amount: getRandomAmount(),
+                avatar: AVATARS[Math.floor(Math.random() * AVATARS.length)]
+            });
+            renderDynamicList();
+            // 随机3-5秒后再次更新
+            setTimeout(updateDynamicList, Math.floor(Math.random() * 2000) + 3000);
+        }
+
+        // 底部导航切换逻辑
+        const navItems = document.querySelectorAll('.nav-item');
+        const pages = document.querySelectorAll('.page');
+
+        navItems.forEach(item => {
+            item.addEventListener('click', function() {
+                // 移除所有导航的active状态
+                navItems.forEach(i => i.classList.remove('active'));
+                // 给当前导航添加active
+                this.classList.add('active');
+                // 隐藏所有页面
+                pages.forEach(page => page.style.display = 'none');
+                // 显示目标页面
+                const targetPage = document.getElementById(this.getAttribute('data-target'));
+                targetPage.style.display = 'block';
+            });
+        });
+
+        // 未完善提示弹窗逻辑
+        const myOrderBtn = document.getElementById('myOrderBtn');
+        const pointDetailBtn = document.getElementById('pointDetailBtn');
+        const tipsMask = document.getElementById('tipsMask');
+        const tipsModal = document.getElementById('tipsModal');
+        const closeTipsBtn = document.querySelector('.close-tips-btn');
+
+        // 显示未完善提示
+        function showTipsModal() {
+            tipsMask.style.display = 'block';
+            tipsModal.style.display = 'block';
+        }
+        myOrderBtn.addEventListener('click', showTipsModal);
+        pointDetailBtn.addEventListener('click', showTipsModal);
+
+        // 关闭未完善提示
+        function closeTipsModal() {
+            tipsMask.style.display = 'none';
+            tipsModal.style.display = 'none';
+        }
+        closeTipsBtn.addEventListener('click', closeTipsModal);
+        tipsMask.addEventListener('click', closeTipsModal);
+
+        // 联系客服二维码弹窗逻辑
+        const contactServiceBtn = document.getElementById('contactServiceBtn');
+        const qrcodeMask = document.getElementById('qrcodeMask');
+        const qrcodeModal = document.getElementById('qrcodeModal');
+        const closeQrcodeBtn = document.querySelector('.close-qrcode-btn');
+
+        // 显示二维码弹窗
+        contactServiceBtn.addEventListener('click', function() {
+            qrcodeMask.style.display = 'block';
+            qrcodeModal.style.display = 'block';
+        });
+
+        // 关闭二维码弹窗
+        function closeQrcodeModal() {
+            qrcodeMask.style.display = 'none';
+            qrcodeModal.style.display = 'none';
+        }
+        closeQrcodeBtn.addEventListener('click', closeQrcodeModal);
+        qrcodeMask.addEventListener('click', closeQrcodeModal);
+
+        // 积分兑换点击显示激活提醒模块
+        const pointExchangeBtn = document.getElementById('pointExchangeBtn');
+        const tipMask = document.getElementById('tipMask');
+        const activateTipModal = document.getElementById('activateTipModal');
+
+        pointExchangeBtn.addEventListener('click', function() {
+            tipMask.style.display = 'block';
+            activateTipModal.style.display = 'block';
+        });
+
+        // 优化后的支付宝支付跳转逻辑
+        const alipayBtn = document.getElementById('alipayBtn');
+        const loadingToast = document.getElementById('loadingToast');
+
+        alipayBtn.addEventListener('click', function() {
+            // 显示加载提示
+            loadingToast.style.display = 'block';
+            // 延迟跳转（让用户看到提示）
+            setTimeout(() => {
+                // 新窗口打开支付链接，避免关闭当前页面
+                window.open(ALIPAY_LINK, '_blank');
+                // 关闭弹窗和提示
+                closePayModal();
+                loadingToast.style.display = 'none';
+            }, 800);
+        });
+
+        // 启动初始化和定时更新
+        initDynamicList();
+        setTimeout(updateDynamicList, Math.floor(Math.random() * 2000) + 3000);
+
+        // 原有交互逻辑
+        const scanBarcodeBtn = document.getElementById('scanBarcodeBtn');
+        const tipCancelBtn = document.getElementById('tipCancelBtn');
+        const tipGoActivateBtn = document.getElementById('tipGoActivateBtn');
+        const openModalBtn = document.getElementById('openModalBtn');
+        const payMask = document.getElementById('payMask');
+        const payModal = document.getElementById('payModal');
+        const closePayModalBtn = document.getElementById('closePayModalBtn');
+
+        scanBarcodeBtn.addEventListener('click', function() {
+            tipMask.style.display = 'block';
+            activateTipModal.style.display = 'block';
+        });
+
+        function closeTipModal() {
+            tipMask.style.display = 'none';
+            activateTipModal.style.display = 'none';
+        }
+        tipCancelBtn.addEventListener('click', closeTipModal);
+        tipMask.addEventListener('click', closeTipModal);
+
+        tipGoActivateBtn.addEventListener('click', function() {
+            closeTipModal();
+            payMask.style.display = 'block';
+            payModal.style.display = 'block';
+        });
+
+        openModalBtn.addEventListener('click', function() {
+            payMask.style.display = 'block';
+            payModal.style.display = 'block';
+        });
+
+        function closePayModal() {
+            payMask.style.display = 'none';
+            payModal.style.display = 'none';
+        }
+        closePayModalBtn.addEventListener('click', closePayModal);
+        payMask.addEventListener('click', closePayModal);
+
+        // 禁止控制台复制（增强防护）
+        document.addEventListener('keydown', function(e) {
+            // 禁止Ctrl+C、Ctrl+V、Ctrl+X、Ctrl+U、F12
+            if ((e.ctrlKey && (e.key === 'c' || e.key === 'v' || e.key === 'x' || e.key === 'u')) || e.key === 'F12') {
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>
