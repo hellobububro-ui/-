@@ -10,61 +10,87 @@
             padding: 0;
             box-sizing: border-box;
             font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
-            /* 全局禁止文本选择复制 */
             -webkit-user-select: none;
             user-select: none;
         }
         body {
             background-color: #f5f5f5;
             padding: 12px;
-            padding-bottom: 80px; /* 适配底部导航栏 */
-            /* 禁止触摸长按弹出菜单 */
+            padding-bottom: 80px;
             -webkit-touch-callout: none;
-            touch-action: none;
+            /* 移除 touch-action: none，恢复滚动功能 */
+            overflow-x: hidden;
         }
-        /* 顶部悬浮交易投诉 */
-        .float-complaint {
-            position: fixed;
-            top: 12px;
-            right: 12px;
-            background-color: #333;
-            color: #fff;
-            font-size: 12px;
-            padding: 4px 8px;
-            border-radius: 4px;
-            text-decoration: none;
-            z-index: 998;
-        }
-        /* 顶部提示栏 */
+        /* 顶部固定提示栏（优化可见性） */
         .top-bar {
+            position: sticky;
+            top: 12px;
             background-color: #fff8e6;
-            padding: 8px 12px;
+            padding: 10px 16px;
             border-radius: 8px;
             margin-bottom: 12px;
             display: flex;
-            justify-content: flex-start;
             align-items: center;
+            z-index: 997;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
         }
         .top-bar .title {
             color: #ff9800;
             font-size: 14px;
             font-weight: 500;
+            display: flex;
+            align-items: center;
         }
-        /* 通用卡片 */
+        .top-bar .title::before {
+            content: "📢";
+            margin-right: 6px;
+        }
+        /* 加载动画（新增） */
+        .loading-container {
+            display: flex;
+            justify-content: center;
+            padding: 20px 0;
+        }
+        .loader {
+            width: 24px;
+            height: 24px;
+            border: 3px solid #ffb74d;
+            border-top: 3px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* 通用卡片优化 */
         .card {
             background-color: #fff;
             border-radius: 8px;
             padding: 16px;
             margin-bottom: 12px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+        .card:active {
+            transform: translateY(1px);
         }
         .card .card-title {
             font-size: 17px;
             font-weight: bold;
             margin-bottom: 16px;
             color: #333;
+            display: flex;
+            align-items: center;
         }
-        /* 扫码流程模块 */
+        .card .card-title::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background-color: #f5f5f5;
+            margin-left: 12px;
+        }
+        /* 扫码流程模块优化 */
         .flow-container {
             display: flex;
             justify-content: space-around;
@@ -78,7 +104,7 @@
             left: 12%;
             width: 76%;
             height: 1px;
-            background-color: #e0e0e0;
+            background-color: #ffb74d;
             z-index: 1;
         }
         .flow-item {
@@ -89,25 +115,29 @@
         .flow-item .num {
             width: 28px;
             height: 28px;
-            background-color: #fff;
-            border: 1px solid #ffb74d;
+            background-color: #ffb74d;
+            color: #fff;
             border-radius: 50%;
-            color: #ff9800;
             display: flex;
             justify-content: center;
             align-items: center;
             margin: 0 auto 4px;
             font-size: 13px;
+            box-shadow: 0 2px 4px rgba(255,183,77,0.3);
         }
         .flow-item .text {
             font-size: 13px;
-            color: #666;
+            color: #ff9800;
+            font-weight: 500;
         }
         .barcode-tip {
             font-size: 13px;
             color: #666;
             margin-bottom: 12px;
             text-align: center;
+            padding: 8px;
+            background-color: #fff8e6;
+            border-radius: 4px;
         }
         .barcode-img {
             text-align: center;
@@ -116,29 +146,37 @@
         .barcode-img img {
             width: 55%;
             max-width: 180px;
-            pointer-events: none; /* 禁止图片长按操作 */
+            pointer-events: none;
+            border: 1px solid #f5f5f5;
+            padding: 8px;
+            border-radius: 4px;
         }
+        /* 核心按钮强化（渐变+更大点击区域） */
         .primary-btn {
             width: 100%;
-            padding: 12px;
-            background-color: #ffb74d;
+            padding: 14px;
+            background: linear-gradient(135deg, #ff9800 0%, #ffb74d 100%);
             color: #fff;
             border: none;
-            border-radius: 6px;
-            font-size: 15px;
-            font-weight: 500;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: all 0.2s;
+            box-shadow: 0 3px 8px rgba(255,152,0,0.2);
+            margin-top: 8px;
         }
         .primary-btn:active {
-            background-color: #ff9800;
+            background: linear-gradient(135deg, #f57c00 0%, #ff9800 100%);
+            box-shadow: 0 2px 4px rgba(255,152,0,0.15);
+            transform: translateY(1px);
         }
-        /* 最新动态模块 */
+        /* 最新动态模块优化 */
         .dynamic-list .item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 8px 0;
+            padding: 10px 0;
             border-bottom: 1px solid #f5f5f5;
         }
         .dynamic-list .item:last-child {
@@ -149,24 +187,31 @@
             align-items: center;
         }
         .item .user-avatar {
-            width: 28px;
-            height: 28px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
-            margin-right: 8px;
-            pointer-events: none; /* 禁止头像长按操作 */
+            margin-right: 10px;
+            pointer-events: none;
+            border: 1px solid #f5f5f5;
         }
         .item .user-text {
-            font-size: 13px;
+            font-size: 14px;
             color: #333;
+        }
+        .item .user-text span {
+            color: #ff9800;
+            font-weight: 500;
         }
         .item .time {
             font-size: 12px;
             color: #999;
+            background-color: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 12px;
         }
-        /* 收益榜单模块 */
+        /* 收益榜单优化 */
         .rank-card .card-title {
             display: flex;
-            justify-content: flex-start;
             align-items: center;
             margin-bottom: 12px;
         }
@@ -174,68 +219,83 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 0;
+            padding: 12px 0;
             border-bottom: 1px solid #f5f5f5;
         }
-        .rank-list .item:last-child {
-            border-bottom: none;
+        .rank-list .item:nth-child(1) .rank-tag {
+            background-color: #ffd700;
+            box-shadow: 0 2px 4px rgba(255,215,0,0.3);
+        }
+        .rank-list .item:nth-child(2) .rank-tag {
+            background-color: #e0e0e0;
+            box-shadow: 0 2px 4px rgba(224,224,224,0.3);
+        }
+        .rank-list .item:nth-child(3) .rank-tag {
+            background-color: #cd7f32;
+            box-shadow: 0 2px 4px rgba(205,127,50,0.3);
         }
         .rank-item .rank-info {
             display: flex;
             align-items: center;
         }
         .rank-item .rank-tag {
-            width: 22px;
-            height: 22px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
             color: #fff;
-            font-size: 11px;
+            font-size: 12px;
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-right: 8px;
-        }
-        .rank-tag.rank1 {
-            background-color: #ffc107;
-        }
-        .rank-tag.rank2 {
-            background-color: #e91e63;
-        }
-        .rank-tag.rank3 {
-            background-color: #2196f3;
-        }
-        .rank-tag.rank4, .rank-tag.rank5 {
-            background-color: #ccc;
-            color: #333;
+            margin-right: 10px;
+            font-weight: bold;
         }
         .rank-item .rank-amount {
-            font-size: 14px;
+            font-size: 15px;
             color: #ff9800;
-            font-weight: 500;
+            font-weight: bold;
         }
         .rank-tip {
             text-align: center;
             font-size: 12px;
             color: #999;
-            margin-top: 8px;
+            margin-top: 10px;
+            padding: 6px;
+            background-color: #fff8e6;
+            border-radius: 4px;
         }
-        /* 收费说明模块 */
+        /* 收费说明+权益提示（新增） */
         .faq-list {
             font-size: 13px;
             color: #333;
-            line-height: 1.7;
+            line-height: 1.8;
         }
         .faq-list li {
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             list-style-position: inside;
+            padding-left: 6px;
+        }
+        .faq-list li::marker {
+            color: #ff9800;
+        }
+        .rights-tip {
+            background-color: #fef7e0;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 12px;
+            font-size: 12px;
+            color: #ff9800;
+            border-left: 3px solid #ffb74d;
         }
         .copyright {
             text-align: center;
             font-size: 11px;
             color: #999;
-            margin-top: 12px;
+            margin-top: 16px;
+            padding-top: 8px;
+            border-top: 1px solid #f5f5f5;
         }
-        /* 底部悬浮激活栏（适配底部导航） */
+        /* 底部悬浮激活栏优化 */
         .activate-bar {
             display: flex;
             background-color: #333;
@@ -243,32 +303,43 @@
             border-radius: 8px;
             overflow: hidden;
             position: fixed;
-            bottom: 70px; /* 避开底部导航栏 */
+            bottom: 70px;
             left: 12px;
             right: 12px;
             z-index: 999;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
         }
         .activate-bar .price-area {
             flex: 1;
-            padding: 14px;
+            padding: 16px;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 15px;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        .activate-bar .price-area span {
+            color: #ffd600;
+            font-size: 18px;
+            margin: 0 4px;
         }
         .activate-bar .activate-btn {
-            flex: 1;
-            background-color: #ffd600;
+            flex: 1.2;
+            background: linear-gradient(135deg, #ffd600 0%, #ffb74d 100%);
             color: #000;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 15px;
-            font-weight: 500;
+            font-size: 16px;
+            font-weight: bold;
             cursor: pointer;
+            transition: all 0.2s;
         }
-        /* 弹窗通用遮罩 */
+        .activate-bar .activate-btn:active {
+            background: linear-gradient(135deg, #ffc107 0%, #ffd600 100%);
+            transform: translateY(1px);
+        }
+        /* 弹窗过渡动画（新增） */
         .mask {
             position: fixed;
             top: 0;
@@ -278,56 +349,78 @@
             background-color: rgba(0,0,0,0.5);
             z-index: 1000;
             display: none;
+            opacity: 0;
+            transition: opacity 0.2s;
         }
-        /* 激活提示弹窗 */
+        .mask.show {
+            display: block;
+            opacity: 1;
+        }
+        .activate-tip-modal, .pay-modal, .qrcode-modal, .tips-modal {
+            transition: transform 0.2s, opacity 0.2s;
+            opacity: 0;
+            transform: translate(-50%, -45%);
+        }
+        .activate-tip-modal.show, .qrcode-modal.show, .tips-modal.show {
+            opacity: 1;
+            transform: translate(-50%, -50%);
+        }
+        .pay-modal {
+            transform: translateY(20px);
+        }
+        .pay-modal.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        /* 激活提示弹窗优化 */
         .activate-tip-modal {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             background-color: #fff;
-            border-radius: 10px;
-            padding: 18px;
+            border-radius: 12px;
+            padding: 20px;
             width: 75%;
             max-width: 280px;
             text-align: center;
             z-index: 1002;
             display: none;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 3px 15px rgba(0,0,0,0.1);
         }
         .activate-tip-modal .modal-title {
-            font-size: 16px;
+            font-size: 17px;
             font-weight: bold;
-            margin-bottom: 12px;
+            margin-bottom: 14px;
             color: #333;
         }
         .activate-tip-modal .modal-desc {
-            font-size: 13px;
+            font-size: 14px;
             color: #666;
-            line-height: 1.5;
-            margin-bottom: 15px;
+            line-height: 1.6;
+            margin-bottom: 18px;
         }
         .activate-tip-modal .btn-group {
             display: flex;
-            border-top: 1px solid #eee;
+            border-top: 1px solid #f5f5f5;
         }
         .activate-tip-modal .btn-group button {
             flex: 1;
-            padding: 10px 0;
+            padding: 12px 0;
             border: none;
             background-color: transparent;
-            font-size: 15px;
+            font-size: 16px;
             cursor: pointer;
         }
         .activate-tip-modal .cancel-btn {
-            color: #333;
-            border-right: 1px solid #eee;
+            color: #999;
+            border-right: 1px solid #f5f5f5;
         }
         .activate-tip-modal .go-activate-btn {
-            color: #1677ff;
-            font-weight: 500;
+            color: #ff9800;
+            font-weight: bold;
         }
-        /* 支付弹窗 */
+        /* 支付弹窗优化 */
         .pay-modal {
             position: fixed;
             bottom: 0;
@@ -336,16 +429,16 @@
             background-color: #fff;
             border-top-left-radius: 16px;
             border-top-right-radius: 16px;
-            padding: 20px 16px;
+            padding: 24px 16px;
             z-index: 1001;
             display: none;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 -3px 15px rgba(0,0,0,0.1);
         }
         .pay-modal .modal-title {
-            font-size: 17px;
+            font-size: 18px;
             font-weight: bold;
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 28px;
             position: relative;
             color: #333;
         }
@@ -353,80 +446,90 @@
             position: absolute;
             top: 0;
             right: 0;
-            font-size: 20px;
+            font-size: 22px;
             color: #999;
             cursor: pointer;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+        }
+        .pay-modal .close-btn:active {
+            background-color: #f5f5f5;
         }
         .pay-modal .amount-wrap {
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 28px;
         }
         .pay-modal .amount-label {
-            font-size: 13px;
+            font-size: 14px;
             color: #999;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
         }
         .pay-modal .amount {
-            font-size: 32px;
+            font-size: 36px;
             font-weight: bold;
-            color: #000;
+            color: #ff9800;
         }
         .pay-modal .pay-method {
-            margin-bottom: 25px;
+            margin-bottom: 28px;
         }
         .pay-modal .method-label {
             font-size: 15px;
             font-weight: 500;
-            margin-bottom: 12px;
+            margin-bottom: 14px;
             color: #333;
         }
         .pay-modal .method-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px;
-            border-radius: 6px;
+            padding: 12px;
+            border-radius: 8px;
             background-color: #f5f5f5;
         }
         .pay-modal .method-item.active {
-            background-color: #e8f5e9;
-            border: 1px solid #4caf50;
+            background-color: #fef7e0;
+            border: 1px solid #ffb74d;
         }
         .pay-modal .method-icon {
-            width: 22px;
-            height: 22px;
-            margin-right: 8px;
-            pointer-events: none; /* 禁止图标长按操作 */
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+            pointer-events: none;
         }
         .pay-modal .method-name {
-            font-size: 14px;
+            font-size: 15px;
             flex: 1;
             color: #333;
         }
         .pay-modal .check-icon {
-            color: #4caf50;
-            font-size: 18px;
+            color: #ff9800;
+            font-size: 20px;
         }
-        /* 优化后的支付按钮 */
+        /* 支付按钮优化 */
         .pay-btn {
             width: 100%;
-            padding: 16px; /* 增大内边距 */
-            background-color: #ff9800; /* 改为橙色，与扫码按钮呼应 */
+            padding: 16px;
+            background: linear-gradient(135deg, #ff9800 0%, #ffb74d 100%);
             color: #fff;
             border: none;
             border-radius: 8px;
-            font-size: 17px; /* 增大字体 */
+            font-size: 17px;
             font-weight: bold;
             cursor: pointer;
-            box-shadow: 0 3px 8px rgba(255,152,0,0.3); /* 增加橙色阴影 */
+            box-shadow: 0 3px 10px rgba(255,152,0,0.3);
             transition: all 0.2s;
         }
         .pay-btn:active {
-            background-color: #f57c00; /* 按压加深颜色 */
-            box-shadow: 0 2px 4px rgba(255,152,0,0.2);
-            transform: translateY(1px); /* 轻微下沉效果 */
+            background: linear-gradient(135deg, #f57c00 0%, #ff9800 100%);
+            box-shadow: 0 2px 6px rgba(255,152,0,0.2);
+            transform: translateY(1px);
         }
-        /* 跳转加载提示 */
+        /* 加载提示优化 */
         .loading-toast {
             position: fixed;
             top: 50%;
@@ -434,13 +537,24 @@
             transform: translate(-50%, -50%);
             background-color: rgba(0,0,0,0.7);
             color: #fff;
-            padding: 12px 20px;
+            padding: 14px 24px;
             border-radius: 8px;
-            font-size: 14px;
+            font-size: 15px;
             z-index: 1003;
             display: none;
+            align-items: center;
         }
-        /* 底部导航栏 */
+        .loading-toast::before {
+            content: "";
+            width: 18px;
+            height: 18px;
+            border: 2px solid #fff;
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+        /* 底部导航栏优化 */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -448,29 +562,31 @@
             width: 100%;
             display: flex;
             background-color: #fff;
-            box-shadow: 0 -1px 4px rgba(0,0,0,0.08);
+            box-shadow: 0 -1px 8px rgba(0,0,0,0.08);
             z-index: 1000;
         }
         .nav-item {
             flex: 1;
             text-align: center;
-            padding: 10px 0;
+            padding: 12px 0;
             cursor: pointer;
             color: #666;
-            transition: color 0.2s;
+            transition: all 0.2s;
         }
         .nav-item.active {
             color: #ff9800;
+            background-color: #fff8e6;
         }
         .nav-icon {
-            font-size: 18px;
+            font-size: 20px;
             margin-bottom: 4px;
             display: block;
         }
         .nav-text {
             font-size: 12px;
+            font-weight: 500;
         }
-        /* 我的页面样式 */
+        /* 我的页面优化 */
         .page {
             display: none;
         }
@@ -478,71 +594,88 @@
             display: block;
         }
         #homePage {
-            display: block; /* 默认显示首页 */
+            display: block;
         }
         .user-header {
             display: flex;
             align-items: center;
-            padding: 16px 12px;
+            padding: 20px 16px;
             background-color: #fff;
             border-radius: 8px;
             margin-bottom: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         .avatar {
-            width: 48px;
-            height: 48px;
+            width: 52px;
+            height: 52px;
             border-radius: 50%;
-            background-color: #eee;
+            background-color: #fff8e6;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
-            color: #999;
-            margin-right: 12px;
-            pointer-events: none; /* 禁止头像长按操作 */
+            font-size: 26px;
+            color: #ff9800;
+            margin-right: 16px;
+            pointer-events: none;
+            border: 1px solid #ffb74d;
         }
         .username {
-            font-size: 16px;
-            font-weight: 500;
+            font-size: 17px;
+            font-weight: bold;
             color: #333;
         }
+        /* 积分卡片优化 */
         .points-card {
-            background-color: #f5f5f5;
+            background: linear-gradient(135deg, #fff8e6 0%, #fef7e0 100%);
             border-radius: 8px;
-            padding: 14px 12px;
+            padding: 18px 16px;
             margin: 0 0 16px;
             font-size: 16px;
             color: #333;
-            background-color: #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
+        .points-card .points-num {
+            font-size: 24px;
+            color: #ff9800;
+            font-weight: bold;
+        }
+        /* 菜单项目优化 */
         .my-menu {
             background-color: #fff;
             border-radius: 8px;
-            padding: 0 12px;
+            padding: 8px 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         .menu-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 14px 0;
+            padding: 16px 0;
             border-bottom: 1px solid #f5f5f5;
-            font-size: 15px;
+            font-size: 16px;
             color: #333;
             cursor: pointer;
+            transition: background-color 0.2s;
         }
         .menu-item:last-child {
             border-bottom: none;
         }
+        .menu-item:active {
+            background-color: #fff8e6;
+        }
         .menu-icon {
-            margin-right: 12px;
-            font-size: 18px;
-            color: #666;
+            margin-right: 14px;
+            font-size: 20px;
+            color: #ff9800;
         }
         .arrow {
             color: #999;
-            font-size: 14px;
+            font-size: 16px;
         }
-        /* 联系客服二维码弹窗 */
+        /* 二维码弹窗优化（新增提示文字） */
         .qrcode-modal {
             position: fixed;
             top: 50%;
@@ -550,29 +683,46 @@
             transform: translate(-50%, -50%);
             background-color: #fff;
             border-radius: 12px;
-            padding: 16px;
+            padding: 20px;
             width: 80%;
             max-width: 300px;
             z-index: 1002;
             display: none;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+            text-align: center;
         }
         .qrcode-modal img {
             width: 100%;
             border-radius: 8px;
-            pointer-events: none; /* 禁止二维码长按操作 */
+            pointer-events: none;
+            margin-bottom: 12px;
+        }
+        .qrcode-modal .qrcode-tip {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 8px;
         }
         .close-qrcode-btn {
             position: absolute;
-            top: 8px;
-            right: 8px;
-            background-color: transparent;
+            top: 12px;
+            right: 12px;
+            background-color: #f5f5f5;
             border: none;
-            font-size: 20px;
+            font-size: 18px;
             color: #999;
             cursor: pointer;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.2s;
         }
-        /* 未完善提示弹窗 */
+        .close-qrcode-btn:active {
+            background-color: #e0e0e0;
+        }
+        /* 未完善提示弹窗优化 */
         .tips-modal {
             position: fixed;
             top: 50%;
@@ -586,32 +736,104 @@
             text-align: center;
             z-index: 1002;
             display: none;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 3px 15px rgba(0,0,0,0.1);
         }
         .tips-title {
             font-size: 17px;
             font-weight: bold;
-            margin-bottom: 12px;
+            margin-bottom: 14px;
             color: #333;
         }
         .tips-content {
             font-size: 14px;
             color: #666;
-            margin-bottom: 16px;
+            margin-bottom: 18px;
         }
         .close-tips-btn {
-            padding: 8px 24px;
+            padding: 10px 32px;
             background-color: #ff9800;
             color: #fff;
             border: none;
-            border-radius: 6px;
-            font-size: 14px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 500;
             cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .close-tips-btn:active {
+            background-color: #f57c00;
+        }
+        /* 支付失败提示（新增） */
+        .fail-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            width: 70%;
+            max-width: 280px;
+            text-align: center;
+            z-index: 1002;
+            display: none;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+        }
+        .fail-modal .fail-icon {
+            font-size: 36px;
+            color: #ff5252;
+            margin-bottom: 12px;
+        }
+        .fail-modal .fail-title {
+            font-size: 17px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .fail-modal .fail-desc {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 16px;
+        }
+        .fail-modal .fail-btn {
+            padding: 10px 24px;
+            background-color: #ff9800;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            cursor: pointer;
+        }
+        /* 顶部悬浮投诉优化 */
+        .float-complaint {
+            position: fixed;
+            top: 12px;
+            right: 12px;
+            background-color: #ff5252;
+            color: #fff;
+            font-size: 12px;
+            padding: 6px 10px;
+            border-radius: 20px;
+            text-decoration: none;
+            z-index: 998;
+            box-shadow: 0 2px 4px rgba(255,82,82,0.3);
+        }
+        /* 图片加载失败占位 */
+        img {
+            object-fit: cover;
+        }
+        img:not([src]) {
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #999;
+            font-size: 12px;
         }
     </style>
 </head>
-<!-- 禁止长按复制、右键菜单、触摸长按事件 -->
-<body oncontextmenu="return false" ontouchstart="return false" oncopy="return false" oncut="return false" onpaste="return false">
+<!-- 移除 ontouchstart="return false"，保留其他防复制事件 -->
+<body oncontextmenu="return false" oncopy="return false" oncut="return false" onpaste="return false">
     <!-- 顶部悬浮交易投诉 -->
     <a href="#" class="float-complaint">交易投诉</a>
 
@@ -619,7 +841,7 @@
     <div class="page" id="homePage">
         <!-- 顶部提示栏 -->
         <div class="top-bar">
-            <div class="title">烟盒变现·扫码回收</div>
+            <div class="title">烟盒变现·扫码回收，激活立享无限畅扫</div>
         </div>
 
         <!-- 扫码回收卡片 -->
@@ -639,9 +861,9 @@
                     <div class="text">领取奖励</div>
                 </div>
             </div>
-            <div class="barcode-tip">条形码一般在盒子侧面，形状如下：</div>
+            <div class="barcode-tip">条形码一般在盒子侧面，对准示例样式扫码即可</div>
             <div class="barcode-img">
-                <img src="http://image.yh.szwwhl.com/web/assets/scan-step-1-R7vssudK.png" alt="条形码示例">
+                <img src="http://image.yh.szwwhl.com/web/assets/scan-step-1-R7vssudK.png" alt="条形码示例" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2Y1ZjVmNSIvPjx0ZXh0IHg9IjUwIiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjciIGZvbnQtZmFtaWx5PSJBcmlhbCIgZmlsbD0iIzU1NSIgc3Ryb2tlPSIjOTkxOTkxIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgYWxpZ25tZW50LWJhc2VsaW5lPSI1IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPlxu5Lq65Yqo5Zu+5Lq65LqM5Lq6PC90ZXh0Pjwvc3ZnPg=='">
             </div>
             <button class="primary-btn" id="scanBarcodeBtn">第一步，扫条形码</button>
         </div>
@@ -649,78 +871,81 @@
         <!-- 最新动态卡片 -->
         <div class="card">
             <div class="card-title">最新动态</div>
-            <div class="dynamic-list" id="dynamicList"></div>
+            <div class="dynamic-list" id="dynamicList">
+                <div class="loading-container">
+                    <div class="loader"></div>
+                </div>
+            </div>
         </div>
 
         <!-- 收益榜单卡片 -->
         <div class="card rank-card">
-            <div class="card-title">
-                <span>收益榜单</span>
-            </div>
+            <div class="card-title">收益榜单</div>
             <div class="rank-list">
                 <div class="item rank-item">
                     <div class="rank-info">
                         <div class="rank-tag rank1">1</div>
                         <div class="user-info">
-                            <img src="https://randomuser.me/api/portraits/men/2.jpg" class="user-avatar" alt="用户头像">
+                            <img src="https://randomuser.me/api/portraits/men/2.jpg" class="user-avatar" alt="用户头像" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2Y1ZjVmNSIvPjxjaXJjbGUgY3g9IjUwIiBjeT0iNDAiIHI9IjMwIiByeD0iMTAiIGZpbGw9IiNmZmYiLz48dGV4dCB4PSI1MCIgeT0iODUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSI3IiBmaWxsPSIjNTU1Ij4xPC90ZXh0Pjwvc3ZnPg=='">
                             <div class="user-text">用户39860700</div>
                         </div>
                     </div>
-                    <div class="rank-amount">¥474992.07</div>
+                    <div class="rank-amount">¥474,992.07</div>
                 </div>
                 <div class="item rank-item">
                     <div class="rank-info">
                         <div class="rank-tag rank2">2</div>
                         <div class="user-info">
-                            <img src="https://randomuser.me/api/portraits/women/3.jpg" class="user-avatar" alt="用户头像">
+                            <img src="https://randomuser.me/api/portraits/women/3.jpg" class="user-avatar" alt="用户头像" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2Y1ZjVmNSIvPjxjaXJjbGUgY3g9IjUwIiBjeT0iNDAiIHI9IjMwIiByeD0iMTAiIGZpbGw9IiNmZmYiLz48dGV4dCB4PSI1MCIgeT0iODUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSI3IiBmaWxsPSIjNTU1Ij4yPC90ZXh0Pjwvc3ZnPg=='">
                             <div class="user-text">无名</div>
                         </div>
                     </div>
-                    <div class="rank-amount">¥454111.69</div>
+                    <div class="rank-amount">¥454,111.69</div>
                 </div>
                 <div class="item rank-item">
                     <div class="rank-info">
                         <div class="rank-tag rank3">3</div>
                         <div class="user-info">
-                            <img src="https://randomuser.me/api/portraits/men/4.jpg" class="user-avatar" alt="用户头像">
+                            <img src="https://randomuser.me/api/portraits/men/4.jpg" class="user-avatar" alt="用户头像" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2Y1ZjVmNSIvPjxjaXJjbGUgY3g9IjUwIiBjeT0iNDAiIHI9IjMwIiByeD0iMTAiIGZpbGw9IiNmZmYiLz48dGV4dCB4PSI1MCIgeT0iODUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSI3IiBmaWxsPSIjNTU1Ij4zPC90ZXh0Pjwvc3ZnPg=='">
                             <div class="user-text">鱼喵喵</div>
                         </div>
                     </div>
-                    <div class="rank-amount">¥360730.85</div>
+                    <div class="rank-amount">¥360,730.85</div>
                 </div>
                 <div class="item rank-item">
                     <div class="rank-info">
                         <div class="rank-tag rank4">4</div>
                         <div class="user-info">
-                            <img src="https://randomuser.me/api/portraits/men/5.jpg" class="user-avatar" alt="用户头像">
+                            <img src="https://randomuser.me/api/portraits/men/5.jpg" class="user-avatar" alt="用户头像" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2Y1ZjVmNSIvPjxjaXJjbGUgY3g9IjUwIiBjeT0iNDAiIHI9IjMwIiByeD0iMTAiIGZpbGw9IiNmZmYiLz48dGV4dCB4PSI1MCIgeT0iODUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSI3IiBmaWxsPSIjNTU1Ij40PC90ZXh0Pjwvc3ZnPg=='">
                             <div class="user-text">念雪归尘</div>
                         </div>
                     </div>
-                    <div class="rank-amount">¥341645.96</div>
+                    <div class="rank-amount">¥341,645.96</div>
                 </div>
                 <div class="item rank-item">
                     <div class="rank-info">
                         <div class="rank-tag rank5">5</div>
                         <div class="user-info">
-                            <img src="https://randomuser.me/api/portraits/lego/2.jpg" class="user-avatar" alt="用户头像">
+                            <img src="https://randomuser.me/api/portraits/lego/2.jpg" class="user-avatar" alt="用户头像" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2Y1ZjVmNSIvPjxjaXJjbGUgY3g9IjUwIiBjeT0iNDAiIHI9IjMwIiByeD0iMTAiIGZpbGw9IiNmZmYiLz48dGV4dCB4PSI1MCIgeT0iODUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSI3IiBmaWxsPSIjNTU1Ij41PC90ZXh0Pjwvc3ZnPg=='">
                             <div class="user-text">凉栀°</div>
                         </div>
                     </div>
-                    <div class="rank-amount">¥334379.07</div>
+                    <div class="rank-amount">¥334,379.07</div>
                 </div>
             </div>
-            <div class="rank-tip">仅展示榜单前5名</div>
+            <div class="rank-tip">榜单实时更新，仅展示前5名用户收益</div>
         </div>
 
         <!-- 收费说明卡片 -->
         <div class="card">
             <div class="card-title">为什么收费？</div>
             <ul class="faq-list">
-                <li>1. 持续优化服务:费用用于服务器维护、安全升级及功能迭代，确保您长期流畅使用。</li>
-                <li>2. 过滤无效用户:防止恶意注册与资源滥用，保障真实用户的体验。</li>
-                <li>3. 解锁完整功能:激活后永久享受无限畅扫。</li>
-                <li>4. 付款后若未激活成功，请联系客服处理。</li>
+                <li>1. 持续优化服务：费用用于服务器维护、安全升级及功能迭代，确保长期流畅使用。</li>
+                <li>2. 过滤无效用户：防止恶意注册与资源滥用，保障真实用户的体验。</li>
+                <li>3. 解锁完整功能：激活后永久享受无限畅扫、积分兑换、提现等全部权益。</li>
+                <li>4. 付款后若未激活成功，请联系客服处理，支持全额退款。</li>
             </ul>
+            <div class="rights-tip">✅ 激活权益：无限次扫码、100%提现成功率、专属客服优先响应</div>
             <div class="copyright">
                 @copyright 2025<br>
                 赣ICP备2025064245号-2A
@@ -729,7 +954,7 @@
 
         <!-- 底部悬浮激活栏 -->
         <div class="activate-bar">
-            <div class="price-area">激活费¥9.90</div>
+            <div class="price-area">激活费 <span>¥9.90</span></div>
             <div class="activate-btn" id="openModalBtn">立即激活</div>
         </div>
     </div>
@@ -740,7 +965,10 @@
             <div class="avatar">👤</div>
             <div class="username">用户44756602</div>
         </div>
-        <div class="points-card">可用积分：0</div>
+        <div class="points-card">
+            <div class="points-label">可用积分</div>
+            <div class="points-num">0</div>
+        </div>
         <div class="my-menu">
             <div class="menu-item" id="myOrderBtn">
                 <div style="display: flex; align-items: center;">
@@ -789,7 +1017,7 @@
     <div class="mask" id="tipMask"></div>
     <div class="activate-tip-modal" id="activateTipModal">
         <div class="modal-title">激活提示</div>
-        <div class="modal-desc">您当前未激活扫码权限，请激活成功后使用！</div>
+        <div class="modal-desc">您当前未激活扫码权限，激活后即可享受无限畅扫、积分兑换等全部功能！</div>
         <div class="btn-group">
             <button class="cancel-btn" id="tipCancelBtn">取消</button>
             <button class="go-activate-btn" id="tipGoActivateBtn">立即激活</button>
@@ -811,20 +1039,20 @@
             <div class="method-label">支付方式</div>
             <div class="method-item active">
                 <div style="display: flex; align-items: center;">
-                    <img src="http://api.yh.saas.szwwhl.com/api/static/alipay_pay.png" class="method-icon" alt="支付宝图标">
+                    <img src="http://api.yh.saas.szwwhl.com/api/static/alipay_pay.png" class="method-icon" alt="支付宝图标" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2Y1ZjVmNSIvPjx0ZXh0IHg9IjUwIiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjciIGZvbnQtZmFtaWx5PSJBcmlhbCIgZmlsbD0iIzU1NSIgc3Ryb2tlPSIjOTkxOTkxIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgYWxpZ25tZW50LWJhc2VsaW5lPSI1Ij7nlLXopoHmlL7nlLXopoHmlL7nlLXopoHPC90ZXh0Pjwvc3ZnPg=='">
                     <div class="method-name">支付宝支付</div>
                 </div>
                 <div class="check-icon">✓</div>
             </div>
         </div>
-        <!-- 优化后的支付按钮 -->
         <button class="pay-btn" id="alipayBtn">立即支付</button>
     </div>
 
-    <!-- 联系客服二维码弹窗（替换为实际二维码链接） -->
+    <!-- 联系客服二维码弹窗 -->
     <div class="mask" id="qrcodeMask"></div>
     <div class="qrcode-modal" id="qrcodeModal">
-        <img src="https://i.imgs.ovh/2025/11/14/CZszhc.jpeg" alt="小盒码客服二维码">
+        <img src="https://i.imgs.ovh/2025/11/14/CZszhc.jpeg" alt="小盒码客服二维码" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2Y1ZjVmNSIvPjx0ZXh0IHg9IjUwIiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjciIGZvbnQtZmFtaWx5PSJBcmlhbCIgZmlsbD0iIzU1NSIgc3Ryb2tlPSIjOTkxOTkxIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgYWxpZ25tZW50LWJhc2VsaW5lPSI1Ij7nlLXopoHmlL7nlLXopoHmlL7nlLXopoHPC90ZXh0Pjwvc3ZnPg=='">
+        <div class="qrcode-tip">扫码添加客服，咨询问题或处理订单</div>
         <button class="close-qrcode-btn">×</button>
     </div>
 
@@ -836,11 +1064,20 @@
         <button class="close-tips-btn">确定</button>
     </div>
 
+    <!-- 支付失败提示弹窗（新增） -->
+    <div class="mask" id="failMask"></div>
+    <div class="fail-modal" id="failModal">
+        <div class="fail-icon">❌</div>
+        <div class="fail-title">支付失败</div>
+        <div class="fail-desc">支付链接跳转失败，请重试或联系客服</div>
+        <button class="fail-btn" id="retryPayBtn">重新支付</button>
+    </div>
+
     <!-- 跳转加载提示 -->
     <div class="loading-toast" id="loadingToast">正在跳转至支付宝...</div>
 
     <script>
-        // 随机数据配置
+        // 配置常量
         const NICKNAMES = ["希尔艾力", "小明", "小李", "小张", "小王", "小赵", "用户"];
         const AVATARS = [
             "https://randomuser.me/api/portraits/men/1.jpg",
@@ -851,51 +1088,42 @@
             "https://randomuser.me/api/portraits/men/3.jpg",
             "https://randomuser.me/api/portraits/women/4.jpg"
         ];
-        let dynamicData = []; // 存储动态数据（含时间戳）
-
-        // 替换为新的支付宝支付链接
         const ALIPAY_LINK = "https://qr.alipay.com/45t14720usgwdnmonbew594";
+        let dynamicData = [];
 
-        // 生成随机提现金额（6-36元，保留2位小数）
+        // 工具函数
         function getRandomAmount() {
             return (Math.random() * 30 + 6).toFixed(2);
         }
-
-        // 根据时间戳生成显示时间（刚刚/1-30分钟前）
         function formatTime(timestamp) {
             const now = Date.now();
-            const diff = Math.floor((now - timestamp) / 60000); // 分钟差
+            const diff = Math.floor((now - timestamp) / 60000);
             return diff === 0 ? "刚刚" : diff <= 30 ? `${diff}分钟前` : `${Math.floor(diff/60)}小时前`;
         }
-
-        // 生成随机用户名
         function getRandomUsername() {
             const nickname = NICKNAMES[Math.floor(Math.random() * NICKNAMES.length)];
             return nickname === "用户" ? `${nickname}${Math.floor(Math.random() * 1000000)}` : nickname;
         }
-
-        // 生成单条动态数据（含时间戳）
         function generateDynamicData() {
             return {
-                id: Date.now(), // 用时间戳当唯一ID
-                timestamp: Date.now() - Math.floor(Math.random() * 30 * 60000), // 随机0-30分钟前的时间戳
+                id: Date.now(),
+                timestamp: Date.now() - Math.floor(Math.random() * 30 * 60000),
                 username: getRandomUsername(),
                 amount: getRandomAmount(),
                 avatar: AVATARS[Math.floor(Math.random() * AVATARS.length)]
             };
         }
 
-        // 渲染动态列表（按时间戳降序排序：最新在上）
+        // 渲染动态列表（优化文案格式）
         function renderDynamicList() {
             const dynamicList = document.getElementById("dynamicList");
             dynamicList.innerHTML = "";
-            // 排序后渲染
             dynamicData.sort((a, b) => b.timestamp - a.timestamp).forEach(item => {
                 dynamicList.innerHTML += `
                     <div class="item">
                         <div class="user-info">
-                            <img src="${item.avatar}" class="user-avatar" alt="用户头像">
-                            <div class="user-text">${item.username}已提现${item.amount}元</div>
+                            <img src="${item.avatar}" class="user-avatar" alt="用户头像" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2Y1ZjVmNSIvPjxjaXJjbGUgY3g9IjUwIiBjeT0iNDAiIHI9IjMwIiByeD0iMTAiIGZpbGw9IiNmZmYiLz48dGV4dCB4PSI1MCIgeT0iODUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSI3IiBmaWxsPSIjNTU1Ij7nlLXopoHPC90ZXh0Pjwvc3ZnPg=='">
+                            <div class="user-text">${item.username} 已提现 <span>¥${item.amount}</span> 元</div>
                         </div>
                         <div class="time">${formatTime(item.timestamp)}</div>
                     </div>
@@ -903,19 +1131,19 @@
             });
         }
 
-        // 初始化：生成5条随机动态并排序渲染
+        // 初始化动态列表
         function initDynamicList() {
             for (let i = 0; i < 5; i++) {
                 dynamicData.push(generateDynamicData());
             }
-            renderDynamicList();
+            setTimeout(() => {
+                renderDynamicList();
+            }, 800); // 模拟加载延迟，提升真实感
         }
 
-        // 定时更新：删除时间最早的一条，新增一条，重新排序渲染（3-5秒间隔）
+        // 定时更新动态列表
         function updateDynamicList() {
-            // 删除时间戳最小（最旧）的一条
             dynamicData = dynamicData.sort((a, b) => a.timestamp - b.timestamp).slice(1);
-            // 新增一条最新动态（时间戳为当前时间）
             dynamicData.push({
                 id: Date.now(),
                 timestamp: Date.now(),
@@ -924,148 +1152,125 @@
                 avatar: AVATARS[Math.floor(Math.random() * AVATARS.length)]
             });
             renderDynamicList();
-            // 随机3-5秒后再次更新
-            setTimeout(updateDynamicList, Math.floor(Math.random() * 2000) + 3000);
+            setTimeout(updateDynamicList, Math.floor(Math.random() * 3000) + 5000); // 延长更新间隔，避免过度干扰
         }
 
-        // 底部导航切换逻辑
+        // 弹窗显示/隐藏（添加过渡动画）
+        function showModal(maskId, modalId) {
+            const mask = document.getElementById(maskId);
+            const modal = document.getElementById(modalId);
+            mask.classList.add('show');
+            modal.classList.add('show');
+            mask.style.display = 'block';
+            modal.style.display = 'block';
+        }
+        function hideModal(maskId, modalId) {
+            const mask = document.getElementById(maskId);
+            const modal = document.getElementById(modalId);
+            mask.classList.remove('show');
+            modal.classList.remove('show');
+            setTimeout(() => {
+                mask.style.display = 'none';
+                modal.style.display = 'none';
+            }, 200);
+        }
+
+        // 底部导航切换
         const navItems = document.querySelectorAll('.nav-item');
         const pages = document.querySelectorAll('.page');
-
         navItems.forEach(item => {
             item.addEventListener('click', function() {
-                // 移除所有导航的active状态
                 navItems.forEach(i => i.classList.remove('active'));
-                // 给当前导航添加active
                 this.classList.add('active');
-                // 隐藏所有页面
                 pages.forEach(page => page.style.display = 'none');
-                // 显示目标页面
                 const targetPage = document.getElementById(this.getAttribute('data-target'));
                 targetPage.style.display = 'block';
             });
         });
 
-        // 未完善提示弹窗逻辑
+        // 未完善功能提示
         const myOrderBtn = document.getElementById('myOrderBtn');
         const pointDetailBtn = document.getElementById('pointDetailBtn');
-        const tipsMask = document.getElementById('tipsMask');
-        const tipsModal = document.getElementById('tipsModal');
-        const closeTipsBtn = document.querySelector('.close-tips-btn');
+        myOrderBtn.addEventListener('click', () => showModal('tipsMask', 'tipsModal'));
+        pointDetailBtn.addEventListener('click', () => showModal('tipsMask', 'tipsModal'));
+        document.querySelector('.close-tips-btn').addEventListener('click', () => hideModal('tipsMask', 'tipsModal'));
+        document.getElementById('tipsMask').addEventListener('click', () => hideModal('tipsMask', 'tipsModal'));
 
-        // 显示未完善提示
-        function showTipsModal() {
-            tipsMask.style.display = 'block';
-            tipsModal.style.display = 'block';
-        }
-        myOrderBtn.addEventListener('click', showTipsModal);
-        pointDetailBtn.addEventListener('click', showTipsModal);
-
-        // 关闭未完善提示
-        function closeTipsModal() {
-            tipsMask.style.display = 'none';
-            tipsModal.style.display = 'none';
-        }
-        closeTipsBtn.addEventListener('click', closeTipsModal);
-        tipsMask.addEventListener('click', closeTipsModal);
-
-        // 联系客服二维码弹窗逻辑
+        // 联系客服二维码弹窗
         const contactServiceBtn = document.getElementById('contactServiceBtn');
-        const qrcodeMask = document.getElementById('qrcodeMask');
-        const qrcodeModal = document.getElementById('qrcodeModal');
-        const closeQrcodeBtn = document.querySelector('.close-qrcode-btn');
+        contactServiceBtn.addEventListener('click', () => showModal('qrcodeMask', 'qrcodeModal'));
+        document.querySelector('.close-qrcode-btn').addEventListener('click', () => hideModal('qrcodeMask', 'qrcodeModal'));
+        document.getElementById('qrcodeMask').addEventListener('click', () => hideModal('qrcodeMask', 'qrcodeModal'));
 
-        // 显示二维码弹窗
-        contactServiceBtn.addEventListener('click', function() {
-            qrcodeMask.style.display = 'block';
-            qrcodeModal.style.display = 'block';
-        });
-
-        // 关闭二维码弹窗
-        function closeQrcodeModal() {
-            qrcodeMask.style.display = 'none';
-            qrcodeModal.style.display = 'none';
-        }
-        closeQrcodeBtn.addEventListener('click', closeQrcodeModal);
-        qrcodeMask.addEventListener('click', closeQrcodeModal);
-
-        // 积分兑换点击显示激活提醒模块
+        // 积分兑换激活提示
         const pointExchangeBtn = document.getElementById('pointExchangeBtn');
-        const tipMask = document.getElementById('tipMask');
-        const activateTipModal = document.getElementById('activateTipModal');
+        pointExchangeBtn.addEventListener('click', () => showModal('tipMask', 'activateTipModal'));
 
-        pointExchangeBtn.addEventListener('click', function() {
-            tipMask.style.display = 'block';
-            activateTipModal.style.display = 'block';
+        // 激活提示弹窗逻辑
+        document.getElementById('tipCancelBtn').addEventListener('click', () => hideModal('tipMask', 'activateTipModal'));
+        document.getElementById('tipMask').addEventListener('click', () => hideModal('tipMask', 'activateTipModal'));
+        document.getElementById('tipGoActivateBtn').addEventListener('click', () => {
+            hideModal('tipMask', 'activateTipModal');
+            setTimeout(() => showModal('payMask', 'payModal'), 200);
         });
 
-        // 优化后的支付宝支付跳转逻辑
+        // 支付弹窗逻辑
+        document.getElementById('openModalBtn').addEventListener('click', () => showModal('payMask', 'payModal'));
+        document.getElementById('closePayModalBtn').addEventListener('click', () => hideModal('payMask', 'payModal'));
+        document.getElementById('payMask').addEventListener('click', () => hideModal('payMask', 'payModal'));
+
+        // 扫码按钮激活提示
+        document.getElementById('scanBarcodeBtn').addEventListener('click', () => showModal('tipMask', 'activateTipModal'));
+
+        // 支付跳转逻辑（新增失败处理）
         const alipayBtn = document.getElementById('alipayBtn');
         const loadingToast = document.getElementById('loadingToast');
-
         alipayBtn.addEventListener('click', function() {
-            // 显示加载提示
-            loadingToast.style.display = 'block';
-            // 延迟跳转（让用户看到提示）
+            loadingToast.style.display = 'flex';
             setTimeout(() => {
-                // 新窗口打开支付链接，避免关闭当前页面
-                window.open(ALIPAY_LINK, '_blank');
-                // 关闭弹窗和提示
-                closePayModal();
-                loadingToast.style.display = 'none';
+                try {
+                    const newWindow = window.open(ALIPAY_LINK, '_blank');
+                    if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+                        throw new Error('跳转失败');
+                    }
+                    hideModal('payMask', 'payModal');
+                    loadingToast.style.display = 'none';
+                } catch (e) {
+                    loadingToast.style.display = 'none';
+                    showModal('failMask', 'failModal');
+                }
             }, 800);
         });
 
-        // 启动初始化和定时更新
+        // 重新支付逻辑
+        document.getElementById('retryPayBtn').addEventListener('click', () => {
+            hideModal('failMask', 'failModal');
+            setTimeout(() => alipayBtn.click(), 200);
+        });
+        document.getElementById('failMask').addEventListener('click', () => hideModal('failMask', 'failModal'));
+
+        // 启动初始化
         initDynamicList();
-        setTimeout(updateDynamicList, Math.floor(Math.random() * 2000) + 3000);
+        setTimeout(updateDynamicList, Math.floor(Math.random() * 3000) + 5000);
 
-        // 原有交互逻辑
-        const scanBarcodeBtn = document.getElementById('scanBarcodeBtn');
-        const tipCancelBtn = document.getElementById('tipCancelBtn');
-        const tipGoActivateBtn = document.getElementById('tipGoActivateBtn');
-        const openModalBtn = document.getElementById('openModalBtn');
-        const payMask = document.getElementById('payMask');
-        const payModal = document.getElementById('payModal');
-        const closePayModalBtn = document.getElementById('closePayModalBtn');
-
-        scanBarcodeBtn.addEventListener('click', function() {
-            tipMask.style.display = 'block';
-            activateTipModal.style.display = 'block';
-        });
-
-        function closeTipModal() {
-            tipMask.style.display = 'none';
-            activateTipModal.style.display = 'none';
-        }
-        tipCancelBtn.addEventListener('click', closeTipModal);
-        tipMask.addEventListener('click', closeTipModal);
-
-        tipGoActivateBtn.addEventListener('click', function() {
-            closeTipModal();
-            payMask.style.display = 'block';
-            payModal.style.display = 'block';
-        });
-
-        openModalBtn.addEventListener('click', function() {
-            payMask.style.display = 'block';
-            payModal.style.display = 'block';
-        });
-
-        function closePayModal() {
-            payMask.style.display = 'none';
-            payModal.style.display = 'none';
-        }
-        closePayModalBtn.addEventListener('click', closePayModal);
-        payMask.addEventListener('click', closePayModal);
-
-        // 禁止控制台复制（增强防护）
+        // 键盘防护
         document.addEventListener('keydown', function(e) {
-            // 禁止Ctrl+C、Ctrl+V、Ctrl+X、Ctrl+U、F12
             if ((e.ctrlKey && (e.key === 'c' || e.key === 'v' || e.key === 'x' || e.key === 'u')) || e.key === 'F12') {
                 e.preventDefault();
             }
         });
+
+        // 额外防长按复制（不影响滚动）
+        document.addEventListener('touchstart', function(e) {
+            // 只阻止长按（超过500ms视为长按），不阻止正常点击和滚动
+            const touchStartTime = Date.now();
+            e.target.addEventListener('touchend', function() {
+                const touchEndTime = Date.now();
+                if (touchEndTime - touchStartTime > 500) {
+                    e.preventDefault();
+                }
+            }, { once: true });
+        }, { passive: false });
     </script>
 </body>
 </html>
